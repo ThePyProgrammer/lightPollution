@@ -16,7 +16,7 @@ While one might think that the best locations are in the middle of wilderness or
 In order to map this, I can use the absolute night-time light datasets<sup>[4-7]</sup> to analyse locations of minimal light intensity. In order to do the filtering of data, I can use the Base Map<sup>[8]</sup> and Matplotlib’s BaseMap Library<sup>[26]</sup>. This can give us a few optimum points best for this type of analysis.
 
 
-### B.	How has the light pollution data around the world changed? Which countries are most susceptible to high light pollution in the future? Which countries are lessening in terms of light pollution?
+### B. How has the light pollution data around the world changed? Which countries are most susceptible to high light pollution in the future? Which countries are lessening in terms of light pollution?
 
 There are many countries that have had rampant increases in Light Pollution over the past few years, while others have made an effort to reduce their already increased Light Pollution. We need to map the data in order to find out which countries are susceptible to the level of problematic light pollution that can be found in cities like Singapore.
 
