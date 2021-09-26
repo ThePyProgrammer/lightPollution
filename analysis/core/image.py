@@ -10,7 +10,8 @@ import seaborn as sns
 import scipy as sp
 from scipy import stats
 import cv2
-from PIL import Image, ImageOps
+from PIL import ImageOps
+import PIL
 import skimage.io as skio
 from skimage.filters import threshold_otsu, threshold_local, try_all_threshold
 from skimage import filters
@@ -22,18 +23,19 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 
+from image.geo import LatLong
+
+
 class Resize:
-    def __init__(self, img: Image):
+    def __init__(self, img):
         self.img = img
 
     def __call__(self, func):
         return self.img.apply(lambda img: resize(img, func(img.shape)), "Resized Version of "+self.img.name)
 
-    def local_mean(self, output_shape):
-        return self.img.apply(lambda img: resize_local_mean(img, output_shape), self.img.name+" resized by local mean "+str(output_shape))
 
 class Plot:
-    def __init__(self, img: Image):
+    def __init__(self, img):
         self.img = img
 
     def __call__(self):
@@ -58,10 +60,18 @@ class Image:
         self.isGray = len(self.img.shape) == 2
         self.resize = Resize(self)
         self.plot = Plot(self)
+        self.latlong = LatLong(self)
+
+    @classmethod
+    def open(cls, path: str, name: str = ""):
+        return cls(skio.imread(path), name=name, path=path)
 
     @classmethod
     def read(cls, path: str, name: str = ""):
-        return cls(skio.imread(path), name=name, path=path)
+        if re.search(r"[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)", path) and re.search("((http|https)://)(www.)?[a-zA-Z0-9@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)", path):
+            return cls(np.asarray(PIL.Image.read(requests.get(url, stream=True).raw)), name=name, path=path)
+        else:
+            return cls(skio.imread(path), name=name, path=path)
 
     def show(self, title="", ax=None):
         if ax is None:
@@ -156,7 +166,8 @@ class Image:
         if ax is None:
             fig, ax = plt.subplots(1, 1)
 
-        self.colorHist(ax=ax, title=self.title if self.title else "Thresholded Color Histogram of %s" % self.name)
+        self.colorHist(
+            ax=ax, title=self.title if self.title else "Thresholded Color Histogram of %s" % self.name)
         try:
             thresh = float(thresh)
             ax.axvline(x=thresh, color="r")
