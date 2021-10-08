@@ -17,3 +17,10 @@ for cell in nb.worksheets[0].cells:
         number_of_words += len(cell['source'].replace('#', '').lstrip().split(' '))
 
 print(number_of_words)
+
+number_of_lines = 0
+for cell in nb.worksheets[0].cells:
+    if cell.cell_type == "code":
+        number_of_lines += cell["input"].strip().count("\n")
+
+print(number_of_lines)
